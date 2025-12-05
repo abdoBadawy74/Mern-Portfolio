@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { motion } from 'framer-motion';
 import { Send, Mail, Phone, MapPin } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,13 +11,21 @@ export default function Contact() {
     email: '',
     message: ''
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission
-    console.log('Form submitted:', formData);
-    alert('Message sent! (Simulation)');
-    setFormData({ name: '', email: '', message: '' });
+    setLoading(true);
+    try {
+      await axios.post('/api/contacts', formData);
+      toast.success('Message sent successfully!');
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -120,9 +130,10 @@ export default function Contact() {
             </div>
             <button
               type="submit"
-              className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              disabled={loading}
+              className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              Send Message
+              {loading ? 'Sending...' : 'Send Message'}
               <Send className="w-4 h-4" />
             </button>
           </motion.form>
