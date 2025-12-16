@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Code, Smartphone, Palette, Globe, Server, Zap } from 'lucide-react';
 import axios from 'axios';
+import { Loader } from '../components/ui/Loader';
 
 interface Service {
     _id: string;
@@ -56,7 +57,7 @@ export default function Services() {
                 </motion.h1>
 
                 {loading ? (
-                    <div className="text-center text-secondary">Loading services...</div>
+                    <Loader />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {services.map((service, index) => (

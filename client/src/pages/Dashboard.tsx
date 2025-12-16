@@ -133,15 +133,11 @@ export default function Dashboard() {
 
         try {
             if (editingProject) {
-                const res = await axios.put(`/api/projects/${editingProject._id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
+                const res = await axios.put(`/api/projects/${editingProject._id}`, formData);
                 setProjects(projects.map(p => p._id === editingProject._id ? res.data : p));
                 toast.success('Project updated successfully');
             } else {
-                const res = await axios.post('/api/projects', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
+                const res = await axios.post('/api/projects', formData);
                 setProjects([res.data, ...projects]);
                 toast.success('Project created successfully');
             }

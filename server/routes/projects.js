@@ -73,6 +73,11 @@ router.get('/:id', async (req, res) => {
 // @access  Private (Admin)
 router.post('/', upload.array('images', 10), async (req, res) => {
     try {
+        console.log('--- Debug Project Creation ---');
+        console.log('Req Body:', req.body);
+        console.log('Req Files:', req.files);
+        console.log('Project Schema Keys:', Object.keys(Project.schema.paths));
+
         const { title, description, link, github, technologies, featured, videoUrl } = req.body;
 
         let images = [];
@@ -99,8 +104,13 @@ router.post('/', upload.array('images', 10), async (req, res) => {
         await project.save();
         res.status(201).json(project);
     } catch (error) {
-        console.error(error);
-        res.status(400).json({ message: 'Bad request', error: error.message });
+        console.error('Project Creation Error:', error);
+        res.status(400).json({
+            message: 'Bad request',
+            error: error.message,
+            receivedBody: req.body,
+            schemaKeys: Object.keys(Project.schema.paths)
+        });
     }
 });
 
