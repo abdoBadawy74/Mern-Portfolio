@@ -2,7 +2,7 @@ import React from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-
+import Profile from '../assests/images/profile.JPG';
 export default function About() {
     const { t } = useTranslation();
 
@@ -22,9 +22,9 @@ export default function About() {
                     <div className="glass-panel p-8 rounded-xl mb-12">
                         <div className="flex flex-col md:flex-row items-center gap-8">
                             <img
-                                src="https://via.placeholder.com/200"
+                                src={Profile}
                                 alt="Profile"
-                                className="w-48 h-48 rounded-full border-4 border-primary/20 object-cover"
+                                className="w-64 h-64 rounded-full border-4 border-primary/20 object-cover"
                             />
                             <div>
                                 <h2 className="text-2xl font-bold mb-4 text-primary">Hi, I'm Abdo</h2>
@@ -39,7 +39,7 @@ export default function About() {
                                         <span className="text-sm text-secondary">Years Experience</span>
                                     </div>
                                     <div className="text-center">
-                                        <span className="block text-3xl font-bold text-accent">50+</span>
+                                        <span className="block text-3xl font-bold text-accent">35+</span>
                                         <span className="text-sm text-secondary">Projects Completed</span>
                                     </div>
                                 </div>
@@ -67,7 +67,7 @@ export default function About() {
                                 </li>
                                 <li className="border-l-2 border-primary/30 pl-4">
                                     <h4 className="font-bold text-foreground">Full Stack Bootcamp</h4>
-                                    <p className="text-sm text-secondary">Tech Academy, 2019</p>
+                                    <p className="text-sm text-secondary">Tech Academy, 2022</p>
                                 </li>
                             </ul>
                         </div>

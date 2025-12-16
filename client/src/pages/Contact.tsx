@@ -63,14 +63,14 @@ export default function Contact() {
                 <Mail className="w-6 h-6 text-accent" />
                 <div>
                   <p className="text-sm text-secondary">Email me at</p>
-                  <p className="font-medium">contact@example.com</p>
+                  <p className="font-medium">badawyabdulrahman099@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 glass-panel p-4 rounded-lg">
                 <Phone className="w-6 h-6 text-accent" />
                 <div>
                   <p className="text-sm text-secondary">Call me at</p>
-                  <p className="font-medium">+1 (555) 123-4567</p>
+                  <p className="font-medium">(+2) 0129890685</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 glass-panel p-4 rounded-lg">
