@@ -1,0 +1,65 @@
+{
+    "nav": {
+        "home": "Home",
+        "projects": "Projects",
+        "services": "Services",
+        "about": "About",
+        "Contact": "Contact",
+        "dashboard": "Dashboard",
+        "login": "Login",
+        "logout": "Logout"
+    },
+    "hero": {
+        "greeting": "Hello, I'm",
+        "name": "Abdulrahman Badawy",
+        "role": "Front-End Developer",
+        "description": "Specializing in React.js & Next.js to build exceptional digital experiences.",
+        "viewWork": "View Work",
+        "contactMe": "Contact Me",
+        "viewCV": "View CV"
+    },
+    "projects": {
+        "code": "Code",
+        "liveDemo": "Live Demo",
+        "video": "Video",
+        "videoTitle": "Project Video"
+    },
+    "aria": {
+        "toggleLanguage": "Toggle Language",
+        "toggleTheme": "Toggle Theme"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "addProject": "Add Project",
+        "addService": "Add Service",
+        "projects": "Projects",
+        "services": "Services",
+        "contacts": "Contact Messages",
+        "noProjects": "No projects found.",
+        "noServices": "No services found.",
+        "noMessages": "No messages found.",
+        "editProject": "Edit Project",
+        "createProject": "Create Project",
+        "editService": "Edit Service",
+        "createService": "Create Service",
+        "cancel": "Cancel",
+        "updateProject": "Update Project",
+        "updateService": "Update Service",
+        "labels": {
+            "titleEn": "Title (EN)",
+            "titleAr": "Title (AR)",
+            "descEn": "Description (EN)",
+            "descAr": "Description (AR)",
+            "images": "Project Images",
+            "videoUrl": "Video URL (YouTube)",
+            "link": "Live Link",
+            "github": "GitHub Link",
+            "technologies": "Technologies (comma separated)",
+            "icon": "Icon Name"
+        }
+    },
+    "common": {
+        "loading": "Loading...",
+        "readMore": "Read More"
+    }
+}

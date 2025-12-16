@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Navbar } from '../components/layout/Navbar';
 import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, Folder, Briefcase, X, MessageSquare, Mail } from 'lucide-react';
@@ -11,7 +12,8 @@ interface Project {
     _id: string;
     title: { en: string; ar: string };
     description: { en: string; ar: string };
-    image: string;
+    images: string[];
+    videoUrl?: string;
     link?: string;
     github?: string;
     technologies: string[];
@@ -38,13 +40,16 @@ export default function Dashboard() {
     const [services, setServices] = useState<Service[]>([]);
     const [contacts, setContacts] = useState<ContactMessage[]>([]);
     const [loading, setLoading] = useState(true);
+    const { t } = useTranslation();
 
     // Project Modal State
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [projectForm, setProjectForm] = useState({
-        titleEn: '', titleAr: '', descEn: '', descAr: '', image: '', link: '', github: '', technologies: ''
+        titleEn: '', titleAr: '', descEn: '', descAr: '', videoUrl: '', link: '', github: '', technologies: ''
     });
+    const [projectFiles, setProjectFiles] = useState<File[]>([]);
+    const [existingImages, setExistingImages] = useState<string[]>([]);
 
     // Service Modal State
     const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
@@ -93,29 +98,56 @@ export default function Dashboard() {
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setProjectFiles(Array.from(e.target.files));
+        }
+    };
+
+    const handleRemoveExistingImage = (img: string) => {
+        setExistingImages(existingImages.filter(i => i !== img));
+    };
+
     const handleProjectSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const payload = {
-            title: { en: projectForm.titleEn, ar: projectForm.titleAr },
-            description: { en: projectForm.descEn, ar: projectForm.descAr },
-            image: projectForm.image,
-            link: projectForm.link,
-            github: projectForm.github,
-            technologies: projectForm.technologies.split(',').map(t => t.trim())
-        };
+
+        const formData = new FormData();
+        formData.append('title', JSON.stringify({ en: projectForm.titleEn, ar: projectForm.titleAr }));
+        formData.append('description', JSON.stringify({ en: projectForm.descEn, ar: projectForm.descAr }));
+        formData.append('link', projectForm.link);
+        formData.append('github', projectForm.github);
+        formData.append('technologies', JSON.stringify(projectForm.technologies.split(',').map(t => t.trim())));
+        if (projectForm.videoUrl) formData.append('videoUrl', projectForm.videoUrl);
+
+        // Append new files
+        projectFiles.forEach(file => {
+            formData.append('images', file);
+        });
+
+        // Append existing images (for edit mode)
+        if (editingProject) {
+            existingImages.forEach(img => {
+                formData.append('existingImages', img);
+            });
+        }
 
         try {
             if (editingProject) {
-                const res = await axios.put(`/api/projects/${editingProject._id}`, payload);
+                const res = await axios.put(`/api/projects/${editingProject._id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
                 setProjects(projects.map(p => p._id === editingProject._id ? res.data : p));
                 toast.success('Project updated successfully');
             } else {
-                const res = await axios.post('/api/projects', payload);
+                const res = await axios.post('/api/projects', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
                 setProjects([res.data, ...projects]);
                 toast.success('Project created successfully');
             }
             closeProjectModal();
         } catch (error) {
+            console.error(error);
             toast.error('Failed to save project');
         }
     };
@@ -128,14 +160,18 @@ export default function Dashboard() {
                 titleAr: project.title.ar,
                 descEn: project.description.en,
                 descAr: project.description.ar,
-                image: project.image,
+                videoUrl: project.videoUrl || '',
                 link: project.link || '',
                 github: project.github || '',
                 technologies: project.technologies.join(', ')
             });
+            setExistingImages(project.images || []);
+            setProjectFiles([]);
         } else {
             setEditingProject(null);
-            setProjectForm({ titleEn: '', titleAr: '', descEn: '', descAr: '', image: '', link: '', github: '', technologies: '' });
+            setProjectForm({ titleEn: '', titleAr: '', descEn: '', descAr: '', videoUrl: '', link: '', github: '', technologies: '' });
+            setExistingImages([]);
+            setProjectFiles([]);
         }
         setIsProjectModalOpen(true);
     };
@@ -224,23 +260,26 @@ export default function Dashboard() {
             <Navbar />
             <main className="container mx-auto px-4 pt-24 pb-12">
                 <div className="flex justify-between items-center mb-12">
+
                     <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-600">
-                        Dashboard
+                        {t('dashboard.title')}
                     </h1>
                     <div className="flex gap-4">
+
                         <button
                             onClick={() => openProjectModal()}
                             className="px-4 py-2 rounded-lg bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-colors flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Project
+                            {t('dashboard.addProject')}
                         </button>
+
                         <button
                             onClick={() => openServiceModal()}
                             className="px-4 py-2 rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30 transition-colors flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Service
+                            {t('dashboard.addService')}
                         </button>
                     </div>
                 </div>
@@ -252,9 +291,10 @@ export default function Dashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         className="glass-panel p-6 rounded-xl"
                     >
+
                         <div className="flex items-center gap-3 mb-6">
                             <Folder className="w-6 h-6 text-cyan-400" />
-                            <h2 className="text-xl font-bold">Projects</h2>
+                            <h2 className="text-xl font-bold">{t('dashboard.projects')}</h2>
                         </div>
 
                         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
@@ -280,7 +320,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                             ))}
-                            {projects.length === 0 && <p className="text-center text-secondary py-4">No projects found.</p>}
+                            {projects.length === 0 && <p className="text-center text-secondary py-4">{t('dashboard.noProjects')}</p>}
                         </div>
                     </motion.div>
 
@@ -291,9 +331,10 @@ export default function Dashboard() {
                         transition={{ delay: 0.1 }}
                         className="glass-panel p-6 rounded-xl"
                     >
+
                         <div className="flex items-center gap-3 mb-6">
                             <Briefcase className="w-6 h-6 text-purple-400" />
-                            <h2 className="text-xl font-bold">Services</h2>
+                            <h2 className="text-xl font-bold">{t('dashboard.services')}</h2>
                         </div>
 
                         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
@@ -319,7 +360,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                             ))}
-                            {services.length === 0 && <p className="text-center text-secondary py-4">No services found.</p>}
+                            {services.length === 0 && <p className="text-center text-secondary py-4">{t('dashboard.noServices')}</p>}
                         </div>
                     </motion.div>
                 </div>
@@ -331,9 +372,10 @@ export default function Dashboard() {
                     transition={{ delay: 0.2 }}
                     className="glass-panel p-6 rounded-xl"
                 >
+
                     <div className="flex items-center gap-3 mb-6">
                         <MessageSquare className="w-6 h-6 text-pink-400" />
-                        <h2 className="text-xl font-bold">Contact Messages</h2>
+                        <h2 className="text-xl font-bold">{t('dashboard.contacts')}</h2>
                     </div>
 
                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
@@ -360,7 +402,7 @@ export default function Dashboard() {
                                 </p>
                             </div>
                         ))}
-                        {contacts.length === 0 && <p className="text-center text-secondary py-4">No messages found.</p>}
+                        {contacts.length === 0 && <p className="text-center text-secondary py-4">{t('dashboard.noMessages')}</p>}
                     </div>
                 </motion.div>
 
@@ -373,7 +415,7 @@ export default function Dashboard() {
                             className="bg-[#1a1a1a] border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
                         >
                             <div className="flex justify-between items-center p-6 border-b border-white/10">
-                                <h2 className="text-xl font-bold">{editingProject ? 'Edit Project' : 'Add New Project'}</h2>
+                                <h2 className="text-xl font-bold">{editingProject ? t('dashboard.editProject') : t('dashboard.createProject')}</h2>
                                 <button onClick={closeProjectModal} className="text-secondary hover:text-white">
                                     <X className="w-6 h-6" />
                                 </button>
@@ -382,7 +424,7 @@ export default function Dashboard() {
                                 {/* ... Project Form Fields (Same as before) ... */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Title (EN)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.titleEn')}</label>
                                         <input
                                             type="text"
                                             value={projectForm.titleEn}
@@ -392,7 +434,7 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Title (AR)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.titleAr')}</label>
                                         <input
                                             type="text"
                                             value={projectForm.titleAr}
@@ -404,7 +446,7 @@ export default function Dashboard() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Description (EN)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.descEn')}</label>
                                         <textarea
                                             value={projectForm.descEn}
                                             onChange={e => setProjectForm({ ...projectForm, descEn: e.target.value })}
@@ -414,7 +456,7 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Description (AR)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.descAr')}</label>
                                         <textarea
                                             value={projectForm.descAr}
                                             onChange={e => setProjectForm({ ...projectForm, descAr: e.target.value })}
@@ -425,18 +467,43 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-secondary mb-1">Image URL</label>
+                                    <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.images')}</label>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-accent outline-none text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90"
+                                    />
+                                    {existingImages.length > 0 && (
+                                        <div className="mt-4 grid grid-cols-4 gap-4">
+                                            {existingImages.map((img, idx) => (
+                                                <div key={idx} className="relative group">
+                                                    <img src={img} alt="Existing" className="w-full h-20 object-cover rounded" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveExistingImage(img)}
+                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.videoUrl')}</label>
                                     <input
                                         type="text"
-                                        value={projectForm.image}
-                                        onChange={e => setProjectForm({ ...projectForm, image: e.target.value })}
-                                        required
+                                        value={projectForm.videoUrl}
+                                        onChange={e => setProjectForm({ ...projectForm, videoUrl: e.target.value })}
                                         className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-accent outline-none"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Live Link</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.link')}</label>
                                         <input
                                             type="text"
                                             value={projectForm.link}
@@ -445,7 +512,7 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">GitHub Link</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.github')}</label>
                                         <input
                                             type="text"
                                             value={projectForm.github}
@@ -455,7 +522,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-secondary mb-1">Technologies (comma separated)</label>
+                                    <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.technologies')}</label>
                                     <input
                                         type="text"
                                         value={projectForm.technologies}
@@ -470,13 +537,13 @@ export default function Dashboard() {
                                         onClick={closeProjectModal}
                                         className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
                                     >
-                                        Cancel
+                                        {t('dashboard.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         className="px-6 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold hover:opacity-90 transition-opacity"
                                     >
-                                        {editingProject ? 'Update Project' : 'Create Project'}
+                                        {editingProject ? t('dashboard.updateProject') : t('dashboard.createProject')}
                                     </button>
                                 </div>
                             </form>
@@ -493,7 +560,7 @@ export default function Dashboard() {
                             className="bg-[#1a1a1a] border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
                         >
                             <div className="flex justify-between items-center p-6 border-b border-white/10">
-                                <h2 className="text-xl font-bold">{editingService ? 'Edit Service' : 'Add New Service'}</h2>
+                                <h2 className="text-xl font-bold">{editingService ? t('dashboard.editService') : t('dashboard.createService')}</h2>
                                 <button onClick={closeServiceModal} className="text-secondary hover:text-white">
                                     <X className="w-6 h-6" />
                                 </button>
@@ -501,7 +568,7 @@ export default function Dashboard() {
                             <form onSubmit={handleServiceSubmit} className="p-6 space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Title (EN)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.titleEn')}</label>
                                         <input
                                             type="text"
                                             value={serviceForm.titleEn}
@@ -511,7 +578,7 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Title (AR)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.titleAr')}</label>
                                         <input
                                             type="text"
                                             value={serviceForm.titleAr}
@@ -523,7 +590,7 @@ export default function Dashboard() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Description (EN)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.descEn')}</label>
                                         <textarea
                                             value={serviceForm.descEn}
                                             onChange={e => setServiceForm({ ...serviceForm, descEn: e.target.value })}
@@ -533,7 +600,7 @@ export default function Dashboard() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-secondary mb-1">Description (AR)</label>
+                                        <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.descAr')}</label>
                                         <textarea
                                             value={serviceForm.descAr}
                                             onChange={e => setServiceForm({ ...serviceForm, descAr: e.target.value })}
@@ -544,7 +611,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-secondary mb-1">Icon Name (e.g., Code, Smartphone)</label>
+                                    <label className="block text-sm font-medium text-secondary mb-1">{t('dashboard.labels.icon')}</label>
                                     <input
                                         type="text"
                                         value={serviceForm.icon}
@@ -560,13 +627,13 @@ export default function Dashboard() {
                                         onClick={closeServiceModal}
                                         className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
                                     >
-                                        Cancel
+                                        {t('dashboard.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         className="px-6 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold hover:opacity-90 transition-opacity"
                                     >
-                                        {editingService ? 'Update Service' : 'Create Service'}
+                                        {editingService ? t('dashboard.updateService') : t('dashboard.createService')}
                                     </button>
                                 </div>
                             </form>

@@ -1,0 +1,65 @@
+{
+    "nav": {
+        "home": "الرئيسية",
+        "projects": "المشاريع",
+        "services": "الخدمات",
+        "about": "عني",
+        "contact": "تواصل معي",
+        "dashboard": "لوحة التحكم",
+        "login": "تسجيل الدخول",
+        "logout": "تسجيل الخروج"
+    },
+    "hero": {
+        "greeting": "مرحباً، أنا",
+        "name": "عبدالرحمن بدوي",
+        "role": "مطور واجهات أمامية",
+        "description": "متخصص في React.js و Next.js لبناء تجارب رقمية استثنائية.",
+        "viewWork": "أعمالي",
+        "contactMe": "تواصل معي",
+        "viewCV": "عرض السيرة الذاتية"
+    },
+    "projects": {
+        "code": "الكود",
+        "liveDemo": "معاينة حية",
+        "video": "فيديو",
+        "videoTitle": "فيديو المشروع"
+    },
+    "aria": {
+        "toggleLanguage": "تغيير اللغة",
+        "toggleTheme": "تغيير المظهر"
+    },
+    "dashboard": {
+        "title": "لوحة التحكم",
+        "addProject": "إضافة مشروع",
+        "addService": "إضافة خدمة",
+        "projects": "المشاريع",
+        "services": "الخدمات",
+        "contacts": "رسائل التواصل",
+        "noProjects": "لا توجد مشاريع.",
+        "noServices": "لا توجد خدمات.",
+        "noMessages": "لا توجد رسائل.",
+        "editProject": "تعديل المشروع",
+        "createProject": "إنشاء المشروع",
+        "editService": "تعديل الخدمة",
+        "createService": "إنشاء الخدمة",
+        "cancel": "إلغاء",
+        "updateProject": "تحديث المشروع",
+        "updateService": "تحديث الخدمة",
+        "labels": {
+            "titleEn": "العنوان (EN)",
+            "titleAr": "العنوان (AR)",
+            "descEn": "الوصف (EN)",
+            "descAr": "الوصف (AR)",
+            "images": "صور المشروع",
+            "videoUrl": "رابط الفيديو (YouTube)",
+            "link": "رابط المعاينة",
+            "github": "رابط GitHub",
+            "technologies": "التقنيات (مفصولة بفواصل)",
+            "icon": "اسم الأيقونة"
+        }
+    },
+    "common": {
+        "loading": "جاري التحميل...",
+        "readMore": "اقرأ المزيد"
+    }
+}

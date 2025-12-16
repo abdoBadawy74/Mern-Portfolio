@@ -32,7 +32,7 @@ export function Navbar() {
                         {t('nav.about')}
                     </Link>
                     <Link to="/contact" className="text-sm hover:text-cyan-400 transition-colors">
-                        Contact
+                        {i18n.language === 'en' ? "Contact" : "تواصل معي"}
                     </Link>
                 </nav>
 
@@ -40,14 +40,14 @@ export function Navbar() {
                     <button
                         onClick={toggleLanguage}
                         className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                        aria-label="Toggle Language"
+                        aria-label={t('aria.toggleLanguage')}
                     >
                         <Languages className="h-5 w-5" />
                     </button>
                     <button
                         onClick={toggleTheme}
                         className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                        aria-label="Toggle Theme"
+                        aria-label={t('aria.toggleTheme')}
                     >
                         {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                     </button>
