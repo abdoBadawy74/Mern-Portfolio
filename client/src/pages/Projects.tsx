@@ -47,7 +47,7 @@ export default function Projects() {
                 <motion.h1
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-4xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-600"
+                    className="text-4xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-600"
                 >
                     {t('nav.projects')}
                 </motion.h1>
@@ -81,7 +81,7 @@ export default function Projects() {
                                                 href={project.github}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-center flex items-center justify-center gap-2 transition-colors"
+                                                className="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-200 dark:bg-white/5 dark:hover:bg-white/10 dark:border-gray-200 text-center flex items-center justify-center gap-2 transition-colors"
                                             >
                                                 <Github className="w-4 h-4" />
                                                 {t('projects.code')}

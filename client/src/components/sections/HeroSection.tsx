@@ -42,7 +42,7 @@ export function HeroSection() {
                     <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500">
                         {t('hero.name')}
                     </h1>
-                    <h3 className="text-2xl md:text-4xl font-bold text-white mb-6">
+                    <h3 className="text-2xl md:text-4xl font-bold text-white dark:text-[#777] mb-6">
                         {t('hero.role')}
                     </h3>
                     <p className="text-xl md:text-2xl text-secondary mb-8 max-w-2xl mx-auto">
@@ -60,7 +60,7 @@ export function HeroSection() {
                             href="https://drive.google.com/file/d/13GcAdF2UiDjStlIp44T2awY83cI01J0S/view?usp=drive_link" // Placeholder path, user might need to upload this
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-3 rounded-full bg-white/10 border border-white/20 text-white font-bold hover:bg-white/20 transition-colors flex items-center gap-2"
+                            className="px-8 py-3 rounded-full bg-gray-100 dark:bg-gray-700 border border-white/20 text-white font-bold hover:bg-gray-800 transition-colors flex items-center gap-2"
                         >
                             <FileText className="w-4 h-4" /> {t('hero.viewCV')}
                         </a>
@@ -85,7 +85,7 @@ export function HeroSection() {
                             <Linkedin className="w-8 h-8" />
                         </a>
                         <a
-                            href="https://wa.me/+201229890685" // Placeholder
+                            href="https://wa.me/+201229890685"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-white/60 hover:text-white transition-colors"
