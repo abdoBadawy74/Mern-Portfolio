@@ -57,7 +57,7 @@ export function HeroSection() {
                             {t('hero.viewWork')} <ArrowRight className="w-4 h-4" />
                         </Link>
                         <a
-                            href="/cv.pdf" // Placeholder path, user might need to upload this
+                            href="https://drive.google.com/file/d/13GcAdF2UiDjStlIp44T2awY83cI01J0S/view?usp=drive_link" // Placeholder path, user might need to upload this
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-8 py-3 rounded-full bg-white/10 border border-white/20 text-white font-bold hover:bg-white/20 transition-colors flex items-center gap-2"
@@ -77,7 +77,7 @@ export function HeroSection() {
                             <Github className="w-8 h-8" />
                         </a>
                         <a
-                            href="https://linkedin.com/in/your-profile" // Placeholder
+                            href="https://www.linkedin.com/in/abdulrahman-badawy-7bb072258/" // Placeholder
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-white/60 hover:text-white transition-colors"
@@ -85,7 +85,7 @@ export function HeroSection() {
                             <Linkedin className="w-8 h-8" />
                         </a>
                         <a
-                            href="https://wa.me/your-number" // Placeholder
+                            href="https://wa.me/+201229890685" // Placeholder
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-white/60 hover:text-white transition-colors"
