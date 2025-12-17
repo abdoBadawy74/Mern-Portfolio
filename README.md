@@ -1,4 +1,4 @@
-# MERN Antigravity Portfolio
+# MERN Portfolio
 
 A futuristic, bilingual (Arabic/English) portfolio built with the MERN stack featuring an "antigravity" design with floating elements and smooth animations.
 
