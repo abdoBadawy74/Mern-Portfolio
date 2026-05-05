@@ -13,7 +13,7 @@ const projectSchema = new mongoose.Schema({
     videoUrl: { type: String }, // New field for video URL
     link: { type: String },
     github: { type: String },
-    technologies: [{ type: String }],
+    technologies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technology' }],
     featured: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }
 });

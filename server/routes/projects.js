@@ -42,11 +42,26 @@ function checkFileType(file, cb) {
 }
 
 // @route   GET /api/projects
-// @desc    Get all projects
+// @desc    Get all projects (optional ?technology=ID filter)
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const projects = await Project.find().sort({ createdAt: -1 });
+        const filter = {};
+        if (req.query.technology) {
+            const techFilter = req.query.technology;
+            if (typeof techFilter === 'string') {
+                if (techFilter.includes(',')) {
+                    filter.technologies = { $in: techFilter.split(',') };
+                } else {
+                    filter.technologies = techFilter;
+                }
+            } else if (Array.isArray(techFilter)) {
+                filter.technologies = { $in: techFilter };
+            }
+        }
+        const projects = await Project.find(filter)
+            .populate('technologies')
+            .sort({ createdAt: -1 });
         res.json(projects);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -58,7 +73,7 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
-        const project = await Project.findById(req.params.id);
+        const project = await Project.findById(req.params.id).populate('technologies');
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
@@ -73,11 +88,6 @@ router.get('/:id', async (req, res) => {
 // @access  Private (Admin)
 router.post('/', upload.array('images', 10), async (req, res) => {
     try {
-        console.log('--- Debug Project Creation ---');
-        console.log('Req Body:', req.body);
-        console.log('Req Files:', req.files);
-        console.log('Project Schema Keys:', Object.keys(Project.schema.paths));
-
         const { title, description, link, github, technologies, featured, videoUrl } = req.body;
 
         let images = [];
@@ -88,7 +98,8 @@ router.post('/', upload.array('images', 10), async (req, res) => {
         // Parse JSON strings back to objects/arrays if they come as strings from FormData
         const parsedTitle = typeof title === 'string' ? JSON.parse(title) : title;
         const parsedDescription = typeof description === 'string' ? JSON.parse(description) : description;
-        const parsedTechnologies = typeof technologies === 'string' ? JSON.parse(technologies) : technologies;
+        // technologies is now an array of ObjectId strings
+        const parsedTechnologies = typeof technologies === 'string' ? JSON.parse(technologies) : (technologies || []);
 
         const project = new Project({
             title: parsedTitle,
@@ -102,14 +113,13 @@ router.post('/', upload.array('images', 10), async (req, res) => {
         });
 
         await project.save();
-        res.status(201).json(project);
+        const populated = await project.populate('technologies');
+        res.status(201).json(populated);
     } catch (error) {
         console.error('Project Creation Error:', error);
         res.status(400).json({
             message: 'Bad request',
-            error: error.message,
-            receivedBody: req.body,
-            schemaKeys: Object.keys(Project.schema.paths)
+            error: error.message
         });
     }
 });
@@ -150,8 +160,8 @@ router.put('/:id', upload.array('images', 10), async (req, res) => {
 
         const parsedTitle = typeof title === 'string' ? JSON.parse(title) : title;
         const parsedDescription = typeof description === 'string' ? JSON.parse(description) : description;
-        const parsedTechnologies = typeof technologies === 'string' ? JSON.parse(technologies) : technologies;
-
+        // technologies is now an array of ObjectId strings
+        const parsedTechnologies = typeof technologies === 'string' ? JSON.parse(technologies) : (technologies || []);
 
         const projectField = {
             title: parsedTitle,
@@ -168,7 +178,7 @@ router.put('/:id', upload.array('images', 10), async (req, res) => {
             req.params.id,
             projectField,
             { new: true, runValidators: true }
-        );
+        ).populate('technologies');
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
