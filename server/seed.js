@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Project = require('./models/Project');
 const Service = require('./models/Service');
+const Technology = require('./models/Technology');
 const User = require('./models/User');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
@@ -13,6 +14,7 @@ const seedData = async () => {
         // Clear existing data
         await Project.deleteMany({});
         await Service.deleteMany({});
+        await Technology.deleteMany({});
         await User.deleteMany({});
 
         // Create admin user
@@ -22,6 +24,24 @@ const seedData = async () => {
             email: 'admin@portfolio.com',
             password: hashedPassword,
             role: 'admin'
+        });
+
+        // Create sample technologies
+        const techData = [
+            { name: { en: 'React', ar: 'رياكت' } },
+            { name: { en: 'Node.js', ar: 'نود' } },
+            { name: { en: 'MongoDB', ar: 'مونجو' } },
+            { name: { en: 'Express', ar: 'اكسبريس' } },
+            { name: { en: 'Next.js', ar: 'نيكست' } },
+            { name: { en: 'TypeScript', ar: 'تايب سكريبت' } },
+            { name: { en: 'Tailwind CSS', ar: 'تيلويند' } },
+            { name: { en: 'API Integration', ar: 'ربط واجهات البرمجة' } },
+            { name: { en: 'CSS3', ar: 'سي اس اس' } }
+        ];
+        const createdTechs = await Technology.insertMany(techData);
+        const techMap = {};
+        createdTechs.forEach(t => {
+            techMap[t.name.en] = t._id;
         });
 
         // Create sample projects
@@ -35,10 +55,10 @@ const seedData = async () => {
                     en: 'A full-stack e-commerce solution with React, Node.js, and MongoDB',
                     ar: 'حل متكامل للتجارة الإلكترونية باستخدام React و Node.js و MongoDB'
                 },
-                image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=500',
+                images: ['https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=500'],
                 link: 'https://example.com/ecommerce',
                 github: 'https://github.com/username/ecommerce',
-                technologies: ['React', 'Node.js', 'MongoDB', 'Express'],
+                technologies: [techMap['React'], techMap['Node.js'], techMap['MongoDB'], techMap['Express']],
                 featured: true
             },
             {
@@ -50,10 +70,10 @@ const seedData = async () => {
                     en: 'A real-time task management application with drag and drop',
                     ar: 'تطبيق لإدارة المهام في الوقت الفعلي مع السحب والإفلات'
                 },
-                image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500',
+                images: ['https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500'],
                 link: 'https://example.com/tasks',
                 github: 'https://github.com/username/tasks',
-                technologies: ['Next.js', 'TypeScript', 'Tailwind CSS'],
+                technologies: [techMap['Next.js'], techMap['TypeScript'], techMap['Tailwind CSS']],
                 featured: true
             },
             {
@@ -65,10 +85,10 @@ const seedData = async () => {
                     en: 'Beautiful weather dashboard with location-based forecasts',
                     ar: 'لوحة معلومات رائعة للطقس مع توقعات حسب الموقع'
                 },
-                image: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?w=500',
+                images: ['https://images.unsplash.com/photo-1592210454359-9043f067919b?w=500'],
                 link: 'https://example.com/weather',
                 github: 'https://github.com/username/weather',
-                technologies: ['React', 'API Integration', 'CSS3'],
+                technologies: [techMap['React'], techMap['API Integration'], techMap['CSS3']],
                 featured: false
             }
         ]);
@@ -122,6 +142,7 @@ const seedData = async () => {
         ]);
 
         console.log('✅ Seed data created successfully!');
+        console.log(`Created ${createdTechs.length} technologies`);
         console.log(`Created ${projects.length} projects`);
         console.log(`Created ${services.length} services`);
         console.log('Admin credentials: username: admin, password: admin123');
